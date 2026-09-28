@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple JWT Authentication</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      width: 350px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 96%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+
+    #dashboard {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Login Page -->
+  <div class="container" id="loginPage">
+
+    <h1>JWT Login</h1>
+
+    <input
+      type="text"
+      id="username"
+      placeholder="Enter username"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Enter password"
+    >
+
+    <button onclick="login()">Login</button>
+
+    <p id="error" class="error"></p>
+
+    <p>
+      <b>Demo Username:</b> admin
+      <br>
+      <b>Demo Password:</b> 1234
+    </p>
+
+  </div>
+
+
+  <!-- Protected Dashboard -->
+  <div class="container" id="dashboard">
+
+    <h1>Protected Dashboard</h1>
+
+    <h2>Welcome, <span id="displayUsername"></span>!</h2>
+
+    <p>
+      <b>User ID:</b>
+      <span id="userId"></span>
+    </p>
+
+    <p>
+      <b>Role:</b>
+      <span id="role"></span>
+    </p>
+
+    <p class="success">
+      You are successfully authenticated!
+    </p>
+
+    <button onclick="logout()">Logout</button>
+
+  </div>
+
+
+  <script>
+
+    // Simulated JWT Token Generation
+    function generateToken(userId, role) {
+
+      const header = {
+        alg: "HS256",
+        typ: "JWT"
+      };
+
+      const payload = {
+        userId: userId,
+        role: role
+      };
+
+      const encodedHeader =
+        btoa(JSON.stringify(header));
+
+      const encodedPayload =
+        btoa(JSON.stringify(payload));
+
+      const signature =
+        "simulated-signature";
+
+      return encodedHeader + "." +
+             encodedPayload + "." +
+             signature;
+    }
+
+
+    // Login Function
+    function login() {
+
+      const username =
+        document.getElementById("username").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      const error =
+        document.getElementById("error");
+
+
+      // Demo authentication
+      if (username === "admin" && password === "1234") {
+
+        const userId = 101;
+        const role = "Admin";
+
+        // Generate token
+        const token =
+          generateToken(userId, role);
+
+        // Store token
+        localStorage.setItem("token", token);
+
+        // Store user information
+        localStorage.setItem(
+          "username",
+          username
+        );
+
+        // Display dashboard
+        showDashboard();
+
+      } else {
+
+        error.innerText =
+          "Invalid username or password!";
+
+      }
+    }
+
+
+    // Show Protected Dashboard
+    function showDashboard() {
+
+      const token =
+        localStorage.getItem("token");
+
+      if (token) {
+
+        document.getElementById("loginPage")
+          .style.display = "none";
+
+        document.getElementById("dashboard")
+          .style.display = "block";
+
+        document.getElementById("displayUsername")
+          .innerText =
+          localStorage.getItem("username");
+
+        document.getElementById("userId")
+          .innerText = "101";
+
+        document.getElementById("role")
+          .innerText = "Admin";
+      }
+    }
+
+
+    // Logout Function
+    function logout() {
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+
+      document.getElementById("dashboard")
+        .style.display = "none";
+
+      document.getElementById("loginPage")
+        .style.display = "block";
+    }
+
+
+    // Check whether user is already logged in
+    window.onload = function() {
+
+      if (localStorage.getItem("token")) {
+        showDashboard();
+      }
+
+    };
+
+  </script>
+
+</body>
+</html>
